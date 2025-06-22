@@ -37,7 +37,8 @@ parse_ltp_output() {
         | sed 's/PASS/pass/; s/FAIL/fail/; s/CONF/skip/'  >> "${RESULT_FILE}"
 }
 
-date -s "2025-06-23 03:30:00"
+ping -c 4 repo.tarsier-infra.isrc.ac.cn
+wget https://repo.tarsier-infra.isrc.ac.cn/openEuler-RISC-V/testing/20250619/v0.1/repo/24.03SP2/OS/riscv64/repodata/repomd.xml
 
 install_ltp() {
     # dnf install -y git make automake gcc clang pkgconf autoconf bison flex m4 kernel-headers glibc-headers clang findutils libtirpc libtirpc-devel pkg-config

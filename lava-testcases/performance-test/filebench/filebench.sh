@@ -37,6 +37,10 @@ mkdir -p "${TEST_TMPDIR}"
 cd "${TEST_TMPDIR}"
 mkdir -p "${OUTPUT}"
 
+ip route
+curl -I https://github.com
+ping -c 10 github.com
+
 git clone https://github.com/filebench/filebench.git
 cd filebench
 libtoolize

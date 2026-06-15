@@ -9,22 +9,44 @@ BRES="bres.json"  # 存放目录/bin的二进制加固结果
 UBRES="ubres.json"   # 存放目录/usr/bin的二进制加固结果
 SBRES="sbres.json"   # 存放目录/sbin的二进制加固结果
 USBRES="usbres.json"   # 存放目录/usr/sbin的二进制加固结果
+RESDIR=()
+SCANDIR=()
 
 # 安装checksec
 pkginstall(){
   dnf install -y git go
   git clone https://github.com/slimm609/checksec.sh.git && cd checksec.sh
   go build -o checksec main.go
+  cp checksec /usr/local/bin/checksec
   chmod +x /usr/local/bin/checksec
 }
 
 # 二进制加固验证
 binary_hardening_test(){
   # 检查 /bin /sbin /usr/bin /usr/sbin
-  checksec dir /bin -o json >> $BRES
-  checksec dir /usr/bin -o json >> $UBRES
-  checksec dir /sbin -o json >> $SBRES
-  checksec dir /usr/sbin -o json >> $USBRES
+  if [ -L "/bin" ] && [ -L "/sbin" ]; then
+    echo "[*] 检测到 UsrMerge: /bin -> $(readlink /bin), /sbin -> $(readlink /sbin)"
+    echo "[*] 仅扫描真实路径: /usr/bin, /usr/sbin"
+    RESDIR=($UBRES $USBRES)
+    SCANDIR=(/usr/bin /usr/sbin)
+  else
+    echo "[*] 未检测到 UsrMerge，使用传统四目录布局"
+    echo "[*] 扫描完整路径: /bin, /sbin, /usr/bin, /usr/sbin"
+    RESDIR=($BRES $SBRES $UBRES $USBRES)
+    SCANDIR=(/bin /sbin /usr/bin /usr/sbin)
+  fi
+  if [ "${#SCANDIR[@]}" -ne "${#RESDIR[@]}" ]; then
+    echo "[!] 错误: SCANDIR(${#SCANDIR[@]}) 与 RESDIR(${#RESDIR[@]}) 数量不匹配！"
+    exit 1
+  fi
+  for i in "${!SCANDIR[@]}"; do
+    scan_path="${SCANDIR[$i]}"
+    res_file="${RESDIR[$i]}"
+    echo "[*] 正在扫描目录: $scan_path"
+    echo "[*] 结果输出至: $res_file"
+    checksec dir "$scan_path" -o json > "$res_file"
+  done
+
 }
 
 # 处理验证结果为lava格式
@@ -270,12 +292,15 @@ pkginstall
 echo "二进制加固验证"
 binary_hardening_test
 
-echo "结果转为lava result格式数据"
-binary_risk_lava "$BRES" "/bin"
-binary_risk_lava "$UBRES" "/usr/bin"
-binary_risk_lava "$SBRES" "/sbin"
-binary_risk_lava "$USBRES" "/usr/sbin"
+echo "结果转化为lava result格式数据"
+for i in "${!SCANDIR[@]}"; do
+  scan_path="${SCANDIR[$i]}"
+  res_file="${RESDIR[$i]}"
 
+  echo "[*] 扫描目录: $scan_path"
+  echo "[*] 结果存放路径: $res_file"
+  binary_risk_lava "$res_file" "$scan_path"
+done
 
 
 

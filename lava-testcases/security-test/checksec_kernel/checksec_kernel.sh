@@ -12,6 +12,7 @@ pkginstall(){
   dnf install -y git go
   git clone https://github.com/slimm609/checksec.sh.git && cd checksec.sh
   go build -o checksec main.go
+  cp checksec /usr/local/bin/checksec
   chmod +x /usr/local/bin/checksec
 }
 
@@ -54,7 +55,7 @@ CHECK_RULES = {
     'CONFIG_FORTIFY_SOURCE': ('Enabled', 3),
     'CONFIG_STRICT_DEVMEM': ('Enabled', 3),
     'CONFIG_IO_STRICT_DEVMEM': ('Enabled', 3),
-#   'kernel.randomize_va_space': ('Enabled', 3), 移除该项检查需要实际值为3才正常
+#   'kernel.randomize_va_space': ('Enabled', 3), 移除该项检查需要检查实际值
     'kernel.kptr_restrict': ('Enabled', 3),
     'kernel.yama.ptrace_scope': ('Enabled', 3),
     'kernel.kexec_load_disabled': ('Enabled', 3),

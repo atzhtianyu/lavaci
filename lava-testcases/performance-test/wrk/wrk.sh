@@ -8,25 +8,26 @@ TEST_TMPDIR="/root/wrk"
 OUTPUT="$(pwd)/output"
 RESULT_FILE="${OUTPUT}/result.txt"
 TEST_LOG="${OUTPUT}/wrk-output.txt"
-TARGET_URL="http://10.30.190.110/"
 
+TARGET_URL="http://10.30.190.110/"
 THREADS="NPROC"
 HTTP_CONNECTIONS="1000"
 DURATION="1m"
 TIMEOUT="10s"
 
 usage() {
-    echo "Usage: $0 [-t <threads>] [-c <http_connections>] [-d <duration>] [-T <timeout>]
+    echo "Usage: $0 [-t <threads>] [-c <http_connections>] [-d <duration>] [-T <timeout>] [-u <TARGET_URL>]
     " 1>&2
     exit 1
 }
 
-while getopts "t:c:d:T:" arg; do
+while getopts "t:c:d:T:u:" arg; do
   case "$arg" in
     t) THREADS="${OPTARG}" ;;
     c) HTTP_CONNECTIONS="${OPTARG}" ;;
     d) DURATION="${OPTARG}" ;;
     T) TIMEOUT="${OPTARG}" ;;
+    u) TARGET_URL="${OPTARG}" ;;
     *) usage ;;
   esac
 done

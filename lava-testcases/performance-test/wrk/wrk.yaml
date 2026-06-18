@@ -17,9 +17,10 @@ params:
   HTTP_CONNECTIONS: "1000"
   DURATION: "1m"
   TIMEOUT: "10s"
+  TARGET_URL: "http://10.30.190.110/"
 run:
   steps:
     - cd lava-testcases/performance-test/wrk
-    - bash wrk.sh -t "${THREADS}" -c "${HTTP_CONNECTIONS}" -d "${DURATION}" -T "${TIMEOUT}"
+    - bash wrk.sh -t "${THREADS}" -c "${HTTP_CONNECTIONS}" -d "${DURATION}" -T "${TIMEOUT}" -u "${TARGET_URL}"
     - chmod +x ../../utils/send-to-lava.sh
     - ../../utils/send-to-lava.sh ./output/result.txt

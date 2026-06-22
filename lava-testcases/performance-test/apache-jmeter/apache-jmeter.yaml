@@ -1,0 +1,29 @@
+metadata:
+  name: apache-jmeter
+  format: "Lava-Test Test Definition 1.0"
+  description: "Run fio on RISC-V device"
+  maintainer:
+    - wujie22@iscas.ac.cn
+  os:
+    - openEuler-riscv64
+  scope:
+      - performance
+  devices:
+    - qemu
+    - lpi4a
+    - sg2042
+    - spacemit-k1-bananapi-f3
+params:
+  THREADS: 50
+  DURATION: 60
+  HOST: "10.30.190.110"
+  PORT: 80
+  SCHEME: "http"
+  REQ_PATH: "/"
+  METHOD: "GET"
+run:
+  steps:
+    - cd lava-testcases/performance-test/apache-jmeter
+    - bash apache-jmeter.sh -t "${THREADS}" -d "${DURATION}" -h "${HOST}" -p "${PORT}" -s "${SCHEME}" -P "${REQ_PATH}" -m "${METHOD}"
+    - chmod +x ../../utils/send-to-lava.sh
+    - ../../utils/send-to-lava.sh ./output/result.txt

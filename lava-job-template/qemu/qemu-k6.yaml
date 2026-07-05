@@ -23,7 +23,7 @@ context:
     - -smp 8
     - -m 8G
     - -device virtio-blk-device,drive=hd0
-    - -append "root=/dev/vda rw console=ttyS0"
+    - -append "root=/dev/vda rw console=ttyS0 selinux=0"
     - -device virtio-net-device,netdev=usernet
     - -netdev user,id=usernet,hostfwd=tcp::10001-:22
 metadata:
